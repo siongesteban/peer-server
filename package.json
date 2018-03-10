@@ -1,0 +1,69 @@
+{
+  "name": "stdnt-io-server",
+  "version": "1.0.0",
+  "description": "Starter project for an ES6 RESTful Express API",
+  "main": "build",
+  "scripts": {
+    "server": "nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
+    "client": "cd ../client && npm start && cd ../server",
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "start": "node build",
+    "build": "babel src -s -D -d build --presets es2015,stage-0",
+    "prod": "concurrently --kill-others \"node build\" \"cd ../client && serve -s build\"",
+    "prestart": "npm run -s build",
+    "heroku-postbuild": "npm install --only=dev && npm install && npm run build",
+    "test": "eslint src"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 7,
+      "sourceType": "module"
+    },
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "no-console": 0,
+      "no-unused-vars": 1
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/developit/express-es6-rest-api.git"
+  },
+  "author": "Jason Miller <jason@developit.ca>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.2",
+    "color": "^3.0.0",
+    "compression": "^1.5.2",
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.3",
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.0",
+    "express": "^4.13.3",
+    "jsonwebtoken": "^8.2.0",
+    "mongoose": "^5.0.6",
+    "morgan": "^1.9.0",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-google-oauth20": "^1.0.0",
+    "passport-local": "^1.0.0",
+    "passport-twitter": "^1.0.4"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-core": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "eslint": "^3.1.1",
+    "nodemon": "^1.9.2"
+  },
+  "bugs": {
+    "url": "https://github.com/developit/express-es6-rest-api/issues"
+  },
+  "homepage": "https://github.com/developit/express-es6-rest-api#readme"
+}
