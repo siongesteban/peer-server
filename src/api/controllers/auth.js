@@ -20,7 +20,6 @@ export const verifyToken = (req, res, next) => {
   }
 
   jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-    console.log('Decoded: ', decoded);
     if (err) {
       return res.status(500).json({
         auth: false,
