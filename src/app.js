@@ -7,21 +7,18 @@ import cookieSession from 'cookie-session';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import cors from 'cors';
+import {} from 'dotenv/config';
 
 import authRoutes from './api/routes/auth';
 import noteRoutes from './api/routes/notes';
 import userRoutes from './api/routes/users';
 import { verifyToken } from './api/controllers/auth';
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').load();
-}
-
 mongoose.Promise = global.Promise;
 
 const app = express();
 
-mongoose.connect(process.env.MONGO_URL);
+mongoose.connect('mongodb://stdnt-io:Ssiioonngg0527__@ds249398.mlab.com:49398/stdnt-io');
 
 app.use(morgan('dev'));
 
