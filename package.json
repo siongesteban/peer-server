@@ -11,7 +11,7 @@
     "build": "babel src -s -D -d build --presets es2015,stage-0 && cd ../client && npm run build && cd ../server",
     "prod": "concurrently --kill-others \"node build\" \"cd ../client && serve -s build\"",
     "prestart": "npm run -s build",
-    "heroku-postbuild": "npm install --only=dev && npm install && npm run build",
+    "heroku-postbuild": "npm install --only=dev && npm install",
     "test": "eslint src"
   },
   "eslintConfig": {
