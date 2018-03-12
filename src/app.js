@@ -7,12 +7,15 @@ import cookieSession from 'cookie-session';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import cors from 'cors';
-import {} from 'dotenv/config';
 
 import authRoutes from './api/routes/auth';
 import noteRoutes from './api/routes/notes';
 import userRoutes from './api/routes/users';
 import { verifyToken } from './api/controllers/auth';
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+}
 
 mongoose.Promise = global.Promise;
 
