@@ -8,7 +8,7 @@
     "client": "cd ../client && npm start && cd ../server",
     "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
     "start": "node build",
-    "build": "babel src -s -D -d build --presets es2015,stage-0",
+    "build": "babel src -s -D -d build --presets es2015,stage-0 && cd ../client && npm run build && cd ../server",
     "prod": "concurrently --kill-others \"node build\" \"cd ../client && serve -s build\"",
     "prestart": "npm run -s build",
     "heroku-postbuild": "npm install --only=dev && npm install && npm run build",

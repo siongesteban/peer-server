@@ -19,7 +19,11 @@ mongoose.Promise = global.Promise;
 const app = express();
 const env = process.env.NODE_ENV || 'development';
 
-mongoose.connect('mongodb://localhost/stdnt-io');
+if (env === 'development') {
+  mongoose.connect('mongodb://localhost/stdnt-io');
+} else {
+  mongoose.connect(process.env.MONGO_URL);
+}
 
 app.use(morgan('dev'));
 
