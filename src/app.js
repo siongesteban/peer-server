@@ -17,13 +17,8 @@ import { verifyToken } from './api/controllers/auth';
 mongoose.Promise = global.Promise;
 
 const app = express();
-const env = process.env.NODE_ENV || 'development';
 
-if (env === 'development') {
-  mongoose.connect('mongodb://localhost/stdnt-io');
-} else {
-  mongoose.connect(process.env.MONGO_URL);
-}
+mongoose.connect(process.env.MONGO_URL);
 
 app.use(morgan('dev'));
 
