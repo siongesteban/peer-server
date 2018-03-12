@@ -9,9 +9,10 @@
     "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
     "start": "node build",
     "build": "babel src -s -D -d build --presets es2015,stage-0 && cd ../client && npm run build && cd ../server",
+    "build:server": "babel src -s -D -d build --presets es2015,stage-0",
     "prod": "concurrently --kill-others \"node build\" \"cd ../client && serve -s build\"",
     "prestart": "npm run -s build",
-    "heroku-postbuild": "npm install --only=dev && npm install",
+    "heroku-postbuild": "npm install --only=dev && npm install && npm run build && npm run build:server",
     "test": "eslint src"
   },
   "eslintConfig": {
