@@ -7,18 +7,20 @@ import cookieSession from 'cookie-session';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import cors from 'cors';
-import {} from 'dotenv/config';
 
 import authRoutes from './api/routes/auth';
 import noteRoutes from './api/routes/notes';
 import userRoutes from './api/routes/users';
 import { verifyToken } from './api/controllers/auth';
 
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+}
+
 mongoose.Promise = global.Promise;
+mongoose.connect(process.env.MONGO_URL);
 
 const app = express();
-
-mongoose.connect('mongodb://stdnt-io:Ssiioonngg0527__@ds249398.mlab.com:49398/stdnt-io');
 
 app.use(morgan('dev'));
 
@@ -28,35 +30,13 @@ app.use(cookieSession({
 }));
 
 // initialize passport
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use(cors())
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-//   if (req.method === 'OPTIONS') {
-//     res.header('Access-Control-Allow-Methods', 'PUT', 'POST', 'PATCH', 'DELETE', 'GET');
-
-//     return res.status(200).json({});
-//   }
-
-//   next();
-// });
-
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    next();
-  }
-
-  res.status(401).json({
-    message: 'UNAUTHORIZED'
-  });
-};
+app.use(cors());
 
 const apiRouter = Router();
 apiRouter.use('/notes', verifyToken, noteRoutes);
@@ -65,10 +45,6 @@ apiRouter.use('/users', verifyToken, userRoutes);
 app.use('/api/v1', apiRouter);
 
 app.get('/', (req, res, next) => {
-  res.status(204);
-})
-
-app.get('/favicon.ico', (req, res, next) => {
   res.status(204);
 });
 
