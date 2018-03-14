@@ -1,12 +1,23 @@
 import mongoose from 'mongoose';
 
 import Note from '../models/note';
+import NoteCollab from '../models/noteCollab';
+import { getUser } from '../../utils/user';
 
 export const getNotes = (req, res, next) => {
-  Note.find({ deleted: false })
-    .select('_id title text author color collabs deleted')
+  Note.find({ isDeleted: false })
+    .populate({
+      path: 'author',
+      select: 'givenName familyName',
+    })
     .exec()
     .then(notes => {
+      if (notes.length === 0) {
+        return res.status(200).json({
+          message: 'There are no notes.',
+        });
+      }
+
       res.status(200).json({
         message: 'Fetched all notes.',
         notes
@@ -45,26 +56,22 @@ export const getNote = (req, res, next) => {
 };
 
 export const createNote = (req, res, next) => {
+  const authorizationHeader = req.headers.authorization;
+  const token = authorizationHeader.split(' ')[1];
+
   const newNote = new Note({
     _id: new mongoose.Types.ObjectId(),
+    author: getUser(token).id,
     title: req.body.title,
-    text: req.body.text,
-    author: req.body.author,
+    content: req.body.content,
     color: req.body.color,
-    collabs: req.body.collabs
 });
 
 newNote.save()
   .then(note => {
     res.status(201).json({
       message: 'New note created.',
-      note: {
-        _id: note._id,
-        title: note.title,
-        text: note.text,
-        author: note.author,
-        color: note.color
-      }
+      note,
     });
   })
   .catch(err => {

@@ -3,6 +3,25 @@ import jwt from 'jsonwebtoken';
 
 import User from '../models/user';
 
+export const getUsers = (req, res, next) => {
+  User.find({})
+    .populate({
+      path: 'notes',
+    })
+    .exec()
+    .then(users => {
+      res.status(200).json({
+        message: 'Fetched all users.',
+        users
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
 export const updateUser = (req, res, next) => {
   const id = req.params.id;
   let propsToUpdate = {};
