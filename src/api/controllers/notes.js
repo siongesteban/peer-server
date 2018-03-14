@@ -21,6 +21,18 @@ export const getNotes = (req, res, next) => {
         select: 'givenName familyName'
       }
     })
+    .populate({
+      path: 'parentNote',
+      select: '-isPartOfCollab -collaborators -isDeleted -__v',
+      populate: {
+        path: 'collabs',
+        select: '-isPartOfCollab -parentNote -collaborators -collabs -tags -isDeleted -__v',
+        populate: {
+          path: 'author',
+          select: 'givenName familyName',
+        },
+      }
+    })
     .exec()
     .then(notes => {
       if (notes.length === 0) {
