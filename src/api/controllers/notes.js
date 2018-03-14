@@ -24,14 +24,16 @@ export const getNotes = (req, res, next) => {
     .populate({
       path: 'parentNote',
       select: '-isPartOfCollab -collaborators -isDeleted -__v',
-      populate: {
-        path: 'collabs',
-        select: '-isPartOfCollab -parentNote -collaborators -collabs -tags -isDeleted -__v',
-        populate: {
-          path: 'author',
-          select: 'givenName familyName',
-        },
-      }
+      populate: [
+          {
+            path: 'collabs',
+            select: '-isPartOfCollab -parentNote -collaborators -collabs -tags -isDeleted -__v',
+          },
+          {
+            path: 'author',
+            select: 'givenName familyName',
+          }
+      ]
     })
     .exec()
     .then(notes => {
@@ -213,13 +215,11 @@ export const updateNote = (req, res, next) => {
 
   Note.update({ _id: id }, {
     $set: {
-      ...propsToUpdate,
-      updatedAt: new Date()
+      ...propsToUpdate
     }
   }).exec()
     .then(result => {
       Note.findById(id)
-        .select('_id title text author collabs color deleted updatedAt')
         .exec()
         .then(note => {
           res.status(200).json({
