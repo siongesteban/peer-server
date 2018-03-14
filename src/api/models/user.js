@@ -20,10 +20,14 @@ const userSchema = new Schema({
   ids: [
     {
       name: String,
-      number: String
+      number: String,
     }
   ],
-  notifications: [notificationSchema]
+  notifications: [notificationSchema],
+  notes: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Note',
+  }],
 }, {
   timestamps: true
 });
