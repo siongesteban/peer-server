@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
 
 import Note from '../models/note';
+import User from '../models/user';
 import NoteCollab from '../models/noteCollab';
 import { getUser } from '../../utils/user';
 
 export const getNotes = (req, res, next) => {
-  Note.find({ isDeleted: false })
+  const userId = getUser(req.headers.authorization).id;
+
+  Note.find({ isDeleted: false, 'author': userId })
     .populate({
       path: 'author',
       select: 'givenName familyName',
@@ -56,12 +59,10 @@ export const getNote = (req, res, next) => {
 };
 
 export const createNote = (req, res, next) => {
-  const authorizationHeader = req.headers.authorization;
-  const token = authorizationHeader.split(' ')[1];
-
+  const userId = getUser(req.headers.authorization).id;
   const newNote = new Note({
     _id: new mongoose.Types.ObjectId(),
-    author: getUser(token).id,
+    author: userId,
     title: req.body.title,
     content: req.body.content,
     color: req.body.color,
@@ -69,10 +70,20 @@ export const createNote = (req, res, next) => {
 
 newNote.save()
   .then(note => {
-    res.status(201).json({
-      message: 'New note created.',
-      note,
-    });
+    User.update({ _id: userId }, {
+      $push: { notes: note.id }
+    }).exec()
+      .then(result => {
+        res.status(201).json({
+          message: 'New note created.',
+          note,
+        });
+      })
+      .catch(err => {
+        res.status(500).json({
+          error: err
+        });
+      })
   })
   .catch(err => {
     res.status(500).json({
