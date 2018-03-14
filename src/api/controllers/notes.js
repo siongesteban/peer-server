@@ -2,16 +2,24 @@ import mongoose from 'mongoose';
 
 import Note from '../models/note';
 import User from '../models/user';
-import NoteCollab from '../models/noteCollab';
 import { getUser } from '../../utils/user';
 
 export const getNotes = (req, res, next) => {
   const userId = getUser(req.headers.authorization).id;
 
-  Note.find({ isDeleted: false, 'author': userId })
+  Note.find({ 'author': userId })
+    .select('-collaborators -__v')
     .populate({
       path: 'author',
       select: 'givenName familyName',
+    })
+    .populate({
+      path: 'collabs',
+      select: '-isPartOfCollab -collaborators -collabs -tags -isDeleted -__v',
+      populate: {
+        path: 'author',
+        select: 'givenName familyName'
+      }
     })
     .exec()
     .then(notes => {
@@ -66,31 +74,120 @@ export const createNote = (req, res, next) => {
     title: req.body.title,
     content: req.body.content,
     color: req.body.color,
-});
-
-newNote.save()
-  .then(note => {
-    User.update({ _id: userId }, {
-      $push: { notes: note.id }
-    }).exec()
-      .then(result => {
-        res.status(201).json({
-          message: 'New note created.',
-          note,
-        });
-      })
-      .catch(err => {
-        res.status(500).json({
-          error: err
-        });
-      })
-  })
-  .catch(err => {
-    res.status(500).json({
-      error: err
-    });
   });
+
+  newNote.save()
+    .then(note => {
+      User.update({ _id: userId }, {
+        $push: { notes: note._id }
+      }).exec()
+        .then(result => {
+          res.status(201).json({
+            message: 'New note created.',
+            note,
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            error: err
+          });
+        })
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
 };
+
+export const createNoteCollab = (req, res, next) => {
+  const authUserEmail = getUser(req.headers.authorization).email;
+
+  // Find the user by email to get its id.
+  User.findOne({ email: req.body.email })
+    .exec()
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({
+          message: 'Could not find the user.',
+        });
+      }
+
+      if (user.email === authUserEmail) {
+        return res.status(403).json({
+          message: `You're already part of the note.`,
+        });
+      }
+
+      // Find the parent note first and determine
+      // if the user is already a part of the collaboration.
+      Note.findOne({ _id: req.body.parentNoteId, collaborators: user._id })
+        .exec()
+        .then(parentNote => {
+          // Check if the user is already included in the collaborators
+          console.log(parentNote);
+          if (parentNote) {
+            return res.status(403).json({
+              message: 'The user is already a collaborator.',
+            });
+          }
+
+          // Proceed on creating a new note for the new collaborator
+
+          // Fill the initial fields
+          const newCollabNote = new Note({
+            _id: new mongoose.Types.ObjectId(),
+            author: user._id,
+            parentNote: req.body.parentNoteId,
+            isPartOfCollab: true,
+          });
+    
+          newCollabNote.save()
+            .then(note => {
+              // After saving, push the new note's id
+              // to the user's notes field
+              User.update({ _id: user._id }, {
+                $push: { notes: note._id }
+              }).exec()
+                .then(result => {
+                  // Update the parent note by pushing the
+                  // collab note's id and collaborator's id
+                  Note.update({ _id: req.body.parentNoteId }, {
+                    $push: {
+                      collaborators: user._id,
+                      collabs: note._id,
+                    }
+                  }).exec()
+                    .then(result => {
+                      res.status(200).json({
+                        message: 'The note has been shared to the user.',
+                      });
+                    })
+                    .catch(err => {
+                      res.status(500).json({
+                        error: err,
+                      });
+                    });
+                })
+                .catch(err => {
+                  res.status(500).json({
+                    error: err
+                  });
+                });
+            });
+        })
+        .catch(err => {
+          return res.status(500).json({
+            error: err,
+          });
+        });
+    })
+    .catch(err => {
+      return res.status(500).json({
+        error: err,
+      });
+    })
+}
 
 export const updateNote = (req, res, next) => {
   const id = req.params.id;

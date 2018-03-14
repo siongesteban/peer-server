@@ -1,49 +1,35 @@
 import mongoose, { Schema } from 'mongoose';
 
-import { noteCollabSchema } from './noteCollab';
-
-// const noteSchema = new Schema({
-//   _id: Schema.Types.ObjectId,
-//   title: {
-//     type: String,
-//     required: true
-//   },
-//   text: String,
-//   author: String,
-//   color: String,
-//   collabs: {
-//     type: [noteCollabSchema],
-//     required: false
-//   },
-//   deleted: {
-//     type: Boolean,
-//     default: false
-//   },
-//   updatedAt: Date
-// });
-
 const noteSchema = new Schema({
   _id: Schema.Types.ObjectId,
   author: {
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  parentNote: {
+    type: Schema.Types.ObjectId,
+    ref: 'Note',
+  },
+  isPartOfCollab: {
+    type: Boolean,
+    default: false,
+  },
   title: {
     type: String,
-    required: true,
   },
   content: {
     type: String,
-    required: true,
   },
-  color: String,
+  color: {
+    type: String,
+  },
   collaborators: [{
     type: Schema.Types.ObjectId,
     ref: 'User',
   }],
   collabs: [{
     type: Schema.Types.ObjectId,
-    ref: 'NoteCollab',
+    ref: 'Note',
   }],
   tags: [String],
   isDeleted: {
