@@ -8,6 +8,7 @@ export const getNotes = (req, res, next) => {
   const userId = getUser(req.headers.authorization).id;
 
   Note.find({ 'author': userId })
+    .sort('-createdAt')
     .select('-collaborators -__v')
     .populate({
       path: 'author',
@@ -40,6 +41,7 @@ export const getNotes = (req, res, next) => {
       if (notes.length === 0) {
         return res.status(200).json({
           message: 'There are no notes.',
+          notes,
         });
       }
 
@@ -94,7 +96,8 @@ export const createNote = (req, res, next) => {
     .then(note => {
       User.update({ _id: userId }, {
         $push: { notes: note._id }
-      }).exec()
+      }).select('-collaborators -__v')
+        .exec()
         .then(result => {
           res.status(201).json({
             message: 'New note created.',
