@@ -6,14 +6,6 @@ const noteSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  parentNote: {
-    type: Schema.Types.ObjectId,
-    ref: 'Note',
-  },
-  isPartOfCollab: {
-    type: Boolean,
-    default: false,
-  },
   title: {
     type: String,
   },
@@ -23,15 +15,6 @@ const noteSchema = new Schema({
   color: {
     type: String,
   },
-  collaborators: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-  }],
-  collabs: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Note',
-  }],
-  tags: [String],
   isDeleted: {
     type: Boolean,
     default: false,
