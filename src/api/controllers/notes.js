@@ -7,7 +7,7 @@ import { getUser } from '../../utils/user';
 export const getNotes = (req, res, next) => {
   const userId = getUser(req.headers.authorization).id;
 
-  Note.find({ 'author': userId })
+  Note.find({ author: userId, isDeleted: false })
     .sort('-createdAt')
     .select('-__v')
     .populate({
@@ -147,19 +147,16 @@ export const updateNote = (req, res, next) => {
 
 export const deleteNote = (req, res, next) => {
   Note.update({ _id: req.params.id }, {
-    $set: { deleted: true }
+    $set: { isDeleted: true }
   }).exec()
     .then(result => {
-      Note.findById(id)
-        .select('_id title text author color')
-        .exec()
-        .then(note => {
-          res.status(200).json({
-            message: 'Note deleted.'
-          });
-        });
+      res.status(200).json({
+        message: 'Note has been deleted.',
+      });
     })
     .catch(err => {
-      res.status(500).json(err);
+      res.status(500).json({
+        error: err,
+      });
     });
 };
