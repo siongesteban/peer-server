@@ -68,7 +68,7 @@ export const getNote = (req, res, next) => {
 export const createNote = (req, res, next) => {
   const userId = getUser(req.headers.authorization).id;
   const newNote = new Note({
-    _id: new mongoose.Types.ObjectId(),
+    _id: req.body._id,
     author: userId,
     title: req.body.title,
     content: req.body.content,
