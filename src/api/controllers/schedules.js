@@ -1,31 +1,31 @@
 import mongoose from 'mongoose';
 
-import Note from '../models/note';
+import Schedule from '../models/schedule';
 import User from '../models/user';
 import { getUser } from '../../utils/user';
 
-export const getNotes = (req, res, next) => {
+export const getSchedules = (req, res, next) => {
   const userId = getUser(req.headers.authorization).id;
 
-  Note.find({ author: userId, isDeleted: false })
+  Schedule.find({ user: userId, isDeleted: false })
     .sort('-createdAt')
     .select('-__v')
     .populate({
-      path: 'author',
+      path: 'user',
       select: 'givenName familyName',
     })
     .exec()
-    .then(notes => {
-      if (notes.length === 0) {
+    .then(schedules => {
+      if (schedules.length === 0) {
         return res.status(200).json({
-          message: 'There are no notes.',
-          notes,
+          message: 'There are no schedules.',
+          schedules,
         });
       }
 
       res.status(200).json({
-        message: 'Fetched all notes.',
-        notes
+        message: 'Fetched all schedules.',
+        schedules
       });
     })
     .catch(err => {
@@ -35,26 +35,27 @@ export const getNotes = (req, res, next) => {
     });
 };
 
-export const getNote = (req, res, next) => {
+export const getSchedule = (req, res, next) => {
   const id = req.params.id;
+  const userId = getUser(req.headers.authorization).id;
 
-  Note.findById(id)
+  Schedule.findOne({ _id: id, user: userId, isDeleted: false })
     .select('-__v')
     .populate({
-      path: 'author',
+      path: 'user',
       select: 'givenName familyName',
     })
     .exec()
-    .then(note => {
-      if (note) {
+    .then(schedule => {
+      if (schedule) {
         res.status(200).json({
-          message: 'Note found.',
-          note,
+          message: 'Schedule found.',
+          schedule,
         });
       } else {
         res.status(404).json({
-          message: 'Not found.',
-          note,
+          message: 'Schedule not found.',
+          schedule,
         });
       }
     })
@@ -65,34 +66,32 @@ export const getNote = (req, res, next) => {
     });
 };
 
-export const createNote = (req, res, next) => {
+export const createSchedule = (req, res, next) => {
   const userId = getUser(req.headers.authorization).id;
-  const newNote = new Note({
-    _id: req.body._id,
-    author: userId,
-    title: req.body.title,
-    content: req.body.content,
-    color: req.body.color,
+  const newSchedule = new Schedule({
+    _id: new mongoose.Types.ObjectId(),
+    user: userId,
+    name: req.body.name
   });
 
-  newNote.save()
-    .then(note => {
+  newSchedule.save()
+    .then(schedule => {
       User.update({ _id: userId }, {
-        $push: { notes: note._id }
+        $push: { schedules: schedule._id }
       }).exec()
         .then(result => {
-          Note.findById(note._id)
+          Schedule.findById(schedule._id)
             .select('-__v')
             .populate({
-              path: 'author',
+              path: 'user',
               select: 'givenName familyName',
             })
             .exec()
-            .then(note => {
-              if (note) {
+            .then(schedule => {
+              if (schedule) {
                 res.status(200).json({
-                  message: 'New note created.',
-                  note,
+                  message: 'New schedule created.',
+                  schedule,
                 });
               }
             })
@@ -115,7 +114,7 @@ export const createNote = (req, res, next) => {
     });
 };
 
-export const updateNote = (req, res, next) => {
+export const updateSchedule = (req, res, next) => {
   const id = req.params.id;
   let propsToUpdate = {};
 
@@ -125,18 +124,23 @@ export const updateNote = (req, res, next) => {
     }
   }
 
-  Note.update({ _id: id }, {
+  Schedule.update({ _id: id }, {
     $set: {
       ...propsToUpdate
     }
   }).exec()
     .then(result => {
-      Note.findById(id)
+      Schedule.findById(id)
+        .select('-__v')
+        .populate({
+          path: 'user',
+          select: 'givenName familyName',
+        })
         .exec()
-        .then(note => {
+        .then(schedule => {
           res.status(200).json({
-            message: 'Note updated.',
-            note
+            message: 'Schedule updated.',
+            schedule
           });
         });
     })
@@ -145,13 +149,13 @@ export const updateNote = (req, res, next) => {
     });
 };
 
-export const deleteNote = (req, res, next) => {
-  Note.update({ _id: req.params.id }, {
+export const deleteSchedule = (req, res, next) => {
+  Schedule.update({ _id: req.params.id }, {
     $set: { isDeleted: true }
   }).exec()
     .then(result => {
       res.status(200).json({
-        message: 'Note has been deleted.',
+        message: 'Schedule has been deleted.',
       });
     })
     .catch(err => {

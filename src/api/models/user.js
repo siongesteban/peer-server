@@ -28,6 +28,10 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Note',
   }],
+  schedules: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Schedule',
+  }],
 }, {
   timestamps: true
 });

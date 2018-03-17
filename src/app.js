@@ -9,8 +9,9 @@ import passport from 'passport';
 import cors from 'cors';
 
 import authRoutes from './api/routes/auth';
-import noteRoutes from './api/routes/notes';
 import userRoutes from './api/routes/users';
+import noteRoutes from './api/routes/notes';
+import scheduleRoutes from './api/routes/schedules';
 import { verifyToken } from './api/controllers/auth';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -39,9 +40,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const apiRouter = Router();
-apiRouter.use('/notes', verifyToken, noteRoutes);
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/users', verifyToken, userRoutes);
+apiRouter.use('/notes', verifyToken, noteRoutes);
+apiRouter.use('/schedules', verifyToken, scheduleRoutes);
 app.use('/api/v1', apiRouter);
 
 app.get('/', (req, res, next) => {
