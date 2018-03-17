@@ -14,10 +14,6 @@ const appointmentSchema = new Schema({
   color: {
     type: String,
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  }
 }, {
   timestamps: true,
 });

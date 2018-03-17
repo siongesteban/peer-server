@@ -12,6 +12,7 @@ import authRoutes from './api/routes/auth';
 import userRoutes from './api/routes/users';
 import noteRoutes from './api/routes/notes';
 import scheduleRoutes from './api/routes/schedules';
+import appointmentRoutes from './api/routes/appointments';
 import { verifyToken } from './api/controllers/auth';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -44,6 +45,7 @@ apiRouter.use('/auth', authRoutes);
 apiRouter.use('/users', verifyToken, userRoutes);
 apiRouter.use('/notes', verifyToken, noteRoutes);
 apiRouter.use('/schedules', verifyToken, scheduleRoutes);
+apiRouter.use('/schedules/appointments', verifyToken, appointmentRoutes);
 app.use('/api/v1', apiRouter);
 
 app.get('/', (req, res, next) => {

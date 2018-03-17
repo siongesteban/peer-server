@@ -11,6 +11,11 @@ export const getSchedules = (req, res, next) => {
     .sort('-createdAt')
     .select('-__v')
     .populate({
+      path: 'appointments',
+      select: 'parentSchedule description timeStart timeEnd color',
+      select: '-createdAt -updatedAt -__v'
+    })
+    .populate({
       path: 'user',
       select: 'givenName familyName',
     })
