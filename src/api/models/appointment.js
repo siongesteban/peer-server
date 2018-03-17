@@ -2,9 +2,9 @@ import mongoose, { Schema } from 'mongoose';
 
 const appointmentSchema = new Schema({
   _id: Schema.Types.ObjectId,
-  scheduleSet: {
+  parentSchedule: {
     type: Schema.Types.ObjectId,
-    ref: 'ScheduleSet',
+    ref: 'Schedule',
   },
   description: {
     type: String,

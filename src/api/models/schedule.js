@@ -9,10 +9,11 @@ const schedule = new Schema({
   name: {
     type: String,
   },
-  schedules: [{
+  appointments: [{
     type: Schema.Types.ObjectId,
     ref: 'Appointment',
   }],
+  color: String,
   isDeleted: {
     type: Boolean,
     default: false,
