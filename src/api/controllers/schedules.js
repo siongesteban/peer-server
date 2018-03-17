@@ -72,7 +72,6 @@ export const createSchedule = (req, res, next) => {
     _id: new mongoose.Types.ObjectId(),
     user: userId,
     name: req.body.name,
-    description: req.body.description,
     color: req.body.color,
   });
 
