@@ -139,6 +139,11 @@ export const updateSchedule = (req, res, next) => {
       Schedule.findById(id)
         .select('-__v')
         .populate({
+          path: 'appointments',
+          select: 'parentSchedule description timeStart timeEnd color',
+          select: '-createdAt -updatedAt -__v'
+        })
+        .populate({
           path: 'user',
           select: 'givenName familyName',
         })

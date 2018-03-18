@@ -6,6 +6,7 @@ const appointmentSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Schedule',
   },
+  day: String,
   description: {
     type: String,
   },

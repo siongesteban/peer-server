@@ -8,6 +8,7 @@ export const createAppointment = (req, res, next) => {
   const newAppointment = new Appointment({
     _id: new mongoose.Types.ObjectId(),
     parentSchedule: scheduleId,
+    day: req.body.day,
     description: req.body.description,
     timeStart: req.body.timeStart,
     timeEnd: req.body.timeEnd,
@@ -21,7 +22,7 @@ export const createAppointment = (req, res, next) => {
       }).exec()
         .then(result => {
           Appointment.findById(appointment._id)
-            .select('-__v')
+            .select('-createdAt -updatedAt -__v')
             .exec()
             .then(appointment => {
               if (appointment) {
@@ -67,7 +68,7 @@ export const updateAppointment = (req, res, next) => {
   }).exec()
     .then(result => {
       Appointment.findById(id)
-        .select('-__v')
+        .select('-createdAt -updatedAt -__v')
         .exec()
         .then(appointment => {
           res.status(200).json({
