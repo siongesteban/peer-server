@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt-nodejs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import generateSillyName from 'sillyname';
 
 import User from '../models/user';
 
@@ -46,13 +47,27 @@ export const signUp = (req, res, next) => {
         _id: new mongoose.Types.ObjectId(),
         username: req.body.username,
         password: req.body.password,
+        givenName: generateSillyName().split(' ')[0],
+        familyName: generateSillyName().split(' ')[1]
       });
 
       newUser.save()
         .then(user => {
-          res.status(201).json({
-            message: 'You account has been created.',
-            user
+          const token = jwt.sign(
+            {
+              id: user._id,
+              givenName: user.givenName,
+              familyName: user.familyName,
+              username: user.username
+            },
+            process.env.SECRET_KEY, {
+              expiresIn: 86400
+            }
+          );
+      
+          res.status(200).json({
+            auth: true,
+            token
           });
         })
         .catch(err => {
