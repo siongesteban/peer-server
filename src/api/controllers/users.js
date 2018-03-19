@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import titleize from 'titleize';
 
 import User from '../models/user';
 
@@ -21,6 +22,13 @@ export const getUsers = (req, res, next) => {
 
 export const updateUser = (req, res, next) => {
   const id = req.params.id;
+
+  req.body = {
+    ...req.body,
+    givenName: titleize(req.body.givenName),
+    familyName: titleize(req.body.familyName),
+  };
+
   let propsToUpdate = {};
 
   for (let prop in req.body) {

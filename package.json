@@ -52,7 +52,8 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
-    "sillyname": "^0.1.0"
+    "sillyname": "^0.1.0",
+    "titleize": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
