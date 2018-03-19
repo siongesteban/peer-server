@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt-nodejs';
+import generateSillyName from 'sillyname';
 
 const notificationSchema = new Schema({
   _id: Schema.Types.ObjectId,
@@ -12,10 +13,16 @@ const notificationSchema = new Schema({
 
 const userSchema = new Schema({
   _id: Schema.Types.ObjectId,
-  email: String,
+  username: String,
   password: String,
-  givenName: String,
-  familyName: String,
+  givenName: {
+    type: String,
+    default: generateSillyName().split(' ')[0]
+  },
+  familyName: {
+    type: String,
+    default: generateSillyName().split(' ')[1]
+  },
   imageUrl: String,
   ids: [
     {

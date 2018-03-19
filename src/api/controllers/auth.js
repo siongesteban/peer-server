@@ -13,7 +13,7 @@ export const verifyToken = (req, res, next) => {
   }
 
   if (!token) {
-    res.status(403).json({
+    return res.status(403).json({
       auth: false,
       token: 'No token provided.'
     });
@@ -33,27 +33,25 @@ export const verifyToken = (req, res, next) => {
 };
 
 export const signUp = (req, res, next) => {
-  User.findOne({ email: req.body.email})
+  User.findOne({ username: req.body.username})
     .exec()
     .then(user => {
       if (user) {
         return res.status(401).json({
-          message: 'Email address is already in use.'
+          message: 'Username is already taken.'
         });
       }
 
       const newUser = new User({
         _id: new mongoose.Types.ObjectId(),
-        email: req.body.email,
+        username: req.body.username,
         password: req.body.password,
-        givenName: req.body.givenName,
-        familyName: req.body.familyName
       });
 
       newUser.save()
         .then(user => {
           res.status(201).json({
-            message: 'User has been created.',
+            message: 'You account has been created.',
             user
           });
         })
@@ -62,44 +60,19 @@ export const signUp = (req, res, next) => {
             message: 'An error occured. Please try again.'
           });
         });
-
-      // User.create({
-      //   _id: new mongoose.Types.ObjectId(),
-      //   auth: {
-      //     local: {
-      //       email: req.body.email,
-      //       password: req.body.password
-      //     }
-      //   }
-      // }, (err, user) => {
-      //   if (err) {
-      //     res.status(500).json({
-      //       message: 'A problem occured.'
-      //     });
-      //   }
-
-      //   const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-      //     expiresIn: 8600
-      //   });
-
-      //   res.status(200).json({
-      //     auth: true,
-      //     token
-      //   });
-      // });
     });
 };
 
 export const me = (req, res, next) => {
   User.findById(req.userId, (err, user) => {
     if (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: 'There was a problem finding the user.'
       });
     }
 
     if (!user) {
-      res.status(400).json({
+      return res.status(400).json({
         message: 'User was not found.'
       });
     }
@@ -109,7 +82,7 @@ export const me = (req, res, next) => {
 };
 
 export const logIn = (req, res, next) => {
-  User.findOne({ 'email': req.body.email }, (err, user) => {
+  User.findOne({ 'username': req.body.username }, (err, user) => {
     if (err) {
       return res.status(500).json({
         message: 'An error occured. Please try again.'
@@ -134,7 +107,7 @@ export const logIn = (req, res, next) => {
         id: user._id,
         givenName: user.givenName,
         familyName: user.familyName,
-        email: user.email
+        username: user.username
       },
       process.env.SECRET_KEY, {
         expiresIn: 86400

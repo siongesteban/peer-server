@@ -5,9 +5,6 @@ import User from '../models/user';
 
 export const getUsers = (req, res, next) => {
   User.find({})
-    .populate({
-      path: 'notes',
-    })
     .exec()
     .then(users => {
       res.status(200).json({
@@ -87,7 +84,7 @@ export const updateUser = (req, res, next) => {
               id,
               givenName: user.givenName,
               familyName: user.familyName,
-              email: user.email
+              username: user.username
             },
             process.env.SECRET_KEY, {
               expiresIn: 86400
