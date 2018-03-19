@@ -1,7 +1,6 @@
 {
-  "name": "stdnt-io-server",
+  "name": "peer-server",
   "version": "1.0.0",
-  "description": "Starter project for an ES6 RESTful Express API",
   "main": "build",
   "scripts": {
     "server": "nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
