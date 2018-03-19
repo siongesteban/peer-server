@@ -23,11 +23,13 @@ export const getUsers = (req, res, next) => {
 export const updateUser = (req, res, next) => {
   const id = req.params.id;
 
-  req.body = {
-    ...req.body,
-    givenName: titleize(req.body.givenName),
-    familyName: titleize(req.body.familyName),
-  };
+  if (!req.body.newPassword) {
+    req.body = {
+      ...req.body,
+      givenName: titleize(req.body.givenName),
+      familyName: titleize(req.body.familyName),
+    };
+  }
 
   let propsToUpdate = {};
 
